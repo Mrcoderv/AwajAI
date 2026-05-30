@@ -1,0 +1,48 @@
+[
+  {
+    "customer_id": 1,
+    "full_name": "Raghav Panthi",
+    "phone_number": "9866412176",
+    "account_number": "ACCT1001",
+    "address": "Kathmandu, Nepal",
+    "is_active": true,
+    "created_at": "2024-01-01T10:00:00Z"
+  },
+  {
+    "customer_id": 2,
+    "full_name": "Sadhana neupane ",
+    "phone_number": "9857654321",
+    "account_number": "ACCT1002",
+    "address": "Pokhara, Nepal",
+    "is_active": true,
+    "created_at": "2024-02-14T09:30:00Z"
+  },
+  {
+    "customer_id": 3,
+    "full_name": "ramesh thapa",
+    "phone_number": "9801112233",
+    "account_number": "ACCT1003",
+    "address": "Biratnagar, Nepal",
+    "is_active": false,
+    "created_at": "2024-03-01T08:00:00Z"
+  }
+  ,
+    {
+        "customer_id": 4,
+        "full_name": "sita shrestha",
+        "phone_number": "9812345678",
+        "account_number": "ACCT1004",
+        "address": "Lalitpur, Nepal",
+        "is_active": true,
+        "created_at": "2024-04-10T11:15:00Z"
+    },
+    {
+        "customer_id": 5,
+        "full_name": "hari bahadur",
+        "phone_number": "9823456789",
+        "account_number": "ACCT1005",
+        "address": "Dharan, Nepal",
+        "is_active": false,
+        "created_at": "2024-05-05T14:45:00Z"
+    }
+]

@@ -1,0 +1,40 @@
+[
+  {
+    "category": "Account",
+    "questions": [
+      "Check my balance",
+      "Show my package",
+      "When does my plan expire?",
+      "Check account for 9866412176"
+    ]
+  },
+  {
+    "category": "FAQ",
+    "questions": [
+      "Can I roll over unused data?",
+      "How do I change my plan?",
+      "How do I activate roaming?",
+      "How can I recharge my account?",
+      "What happens if my balance is low?"
+    ]
+  },
+  {
+    "category": "Nepali",
+    "questions": [
+      "मेरो ब्यालेन्स कति छ?",
+      "मेरो प्याकेज के हो?",
+      "मेरो प्लान कहिले सकिन्छ?",
+      "मैले आफ्नो प्लान कसरी परिवर्तन गर्ने?"
+    ]
+  },
+  {
+    "category": "Support",
+    "questions": [
+      "Internet is not working",
+      "Why is my data slow?",
+      "Network issue",
+      "Contact support",
+      "What are the latest data packages?"
+    ]
+  }
+]

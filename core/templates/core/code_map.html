@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Awaj AI | Code Map{% endblock %}
+
+{% block content %}
+<section class="code-map-shell">
+  <div class="map-banner panel">
+    <p class="eyebrow">Code Map</p>
+    <h1>How AwajAI works</h1>
+  
+  </div>
+
+  <div class="map-card">
+    <h2 class="map-section-title">Architecture Visualization</h2>
+    <div class="architecture-embed">
+      <object data="{% static 'docs/code-map.svg' %}" type="image/svg+xml" class="code-map-svg" aria-label="Architecture diagram">Your browser does not support inline SVG. <a href="{% static 'docs/code-map.svg' %}">Open SVG</a></object>
+    </div>
+  </div>
+</section>
+<script>
+  (function(){
+    const btn = document.getElementById('delete-code-map');
+    if (!btn) return;
+    const getCookie = (name) => {
+      if (!document.cookie) return null;
+      const cookies = document.cookie.split(';').map(c=>c.trim());
+      for (const c of cookies) if (c.startsWith(name + '=')) return decodeURIComponent(c.split('=')[1]);
+      return null;
+    };
+
+    btn.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to delete the architecture SVG? This cannot be undone.')) return;
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+      try {
+        const resp = await fetch('/api/delete-code-map', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken') || ''
+          }
+        });
+        const json = await resp.json();
+        if (!json.ok) throw new Error(json.message || 'Delete failed');
+        alert('Architecture SVG deleted.');
+        // hide download/view buttons
+        document.querySelectorAll('.download-link, .map-actions a[target="_blank"]').forEach(el=>el.style.display='none');
+        btn.style.display = 'none';
+      } catch (err) {
+        alert('Failed to delete architecture: ' + (err.message || err));
+        btn.disabled = false;
+        btn.textContent = 'Delete Architecture';
+      }
+    });
+  })();
+</script>
+{% endblock %}

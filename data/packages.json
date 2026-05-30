@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "TelConnect Starter",
+    "price": 199.0,
+    "data_gb": 5,
+    "voice_minutes": 200,
+    "sms_count": 100,
+    "is_active": true,
+    "description": "Entry-level plan"
+  },
+  {
+    "id": 2,
+    "name": "TelConnect Smart",
+    "price": 399.0,
+    "data_gb": 12,
+    "voice_minutes": 500,
+    "sms_count": 250,
+    "is_active": true,
+    "description": "Balanced data + voice"
+  },
+  {
+    "id": 3,
+    "name": "TelConnect Plus",
+    "price": 699.0,
+    "data_gb": 30,
+    "voice_minutes": 1000,
+    "sms_count": 500,
+    "is_active": true,
+    "description": "Premium plan"
+  }
+]

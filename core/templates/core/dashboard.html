@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Awaj AI | Dashboard{% endblock %}
+
+{% block content %}
+<section class="panel dashboard-grid">
+  <div class="dashboard-header">
+    <p class="eyebrow">Customer dashboard</p>
+    <h1>Customer info view.</h1>
+    <p class="lede">Search by phone to review a customer record, or use the latest record if no phone is entered.</p>
+  </div>
+
+  <form class="search-bar" method="get">
+    <label for="phone">Phone number</label>
+    <div class="search-row">
+      <input id="phone" name="phone" type="text" value="{{ search_phone }}" placeholder="Enter phone number">
+      <button class="button button-primary" type="submit">Find customer</button>
+    </div>
+  </form>
+
+  <div class="info-card">
+    {% if customer %}
+      <div class="info-row"><span>Name</span><strong>{{ customer.full_name }}</strong></div>
+      <div class="info-row"><span>Phone</span><strong>{{ customer.phone_number }}</strong></div>
+      <div class="info-row"><span>Account</span><strong>{{ customer.account_number }}</strong></div>
+      <div class="info-row"><span>Status</span><strong>{% if customer.is_active %}Active{% else %}Inactive{% endif %}</strong></div>
+      <div class="info-row"><span>Email</span><strong>{{ customer.email|default:'Not provided' }}</strong></div>
+      <div class="info-row"><span>Address</span><strong>{{ customer.address|default:'Not provided' }}</strong></div>
+    {% else %}
+      <p class="empty-state">No customer found yet. Enter a phone number to look one up.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

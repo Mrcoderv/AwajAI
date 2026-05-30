@@ -1,0 +1,171 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Awaj AI{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  </head>
+  <body>
+    <div class="site-frame">
+      <header class="topbar">
+        <a class="brand" href="{% url 'home' %}">Awaj AI</a>
+        <nav class="nav">
+          <a href="{% url 'home' %}">Home</a>
+          <a href="{% url 'chat_page' %}">Chat</a>
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'code_map' %}">Code Map</a>
+        </nav>
+      </header>
+      <main class="page-shell">
+        {% block content %}{% endblock %}
+      </main>
+      <!-- Create Test Account Modal -->
+      <div class="modal" id="create-account-modal" aria-hidden="true" style="display:none;">
+        <div class="modal-panel">
+          <header>
+            <h2>Create Test Account</h2>
+            <button id="close-create-account" aria-label="Close">×</button>
+          </header>
+          <form id="create-account-form">
+            <div class="form-grid">
+              <label>Full Name<input name="full_name" required></label>
+              <label>Phone Number<input name="phone_number" required></label>
+              <label>Customer ID (optional)<input name="customer_id"></label>
+              <label>Package Name<input name="package_name" value="TelConnect Starter"></label>
+              <label>Data Balance (GB)<input name="data_balance_gb" type="number" step="0.1" value="5"></label>
+              <label>Voice Minutes<input name="voice_minutes" type="number" value="100"></label>
+              <label>SMS Count<input name="sms_count" type="number" value="50"></label>
+              <label>Account Balance (Rs.)<input name="account_balance" type="number" step="0.01" value="100"></label>
+              <label>Expiry Date<input name="expiry_date" type="date"></label>
+              <label>Language
+                <select name="language">
+                  <option value="en">English</option>
+                  <option value="ne">Nepali</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button class="button button-secondary" id="generate-sample" type="button">Generate Sample Customer</button>
+              <button class="button button-primary" type="submit">Create Test Account</button>
+            </div>
+            <div id="create-account-messages" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+      <script>
+        (function(){
+          const modal = document.getElementById('create-account-modal');
+          const openBtn = document.getElementById('create-test-account-button');
+          const closeBtn = document.getElementById('close-create-account');
+          const form = document.getElementById('create-account-form');
+          const messages = document.getElementById('create-account-messages');
+
+          const showModal = () => { modal.style.display = 'block'; modal.setAttribute('aria-hidden','false'); };
+          const hideModal = () => { modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); };
+
+          // load demo accounts into demo-accounts-list
+          const loadDemoAccounts = async () => {
+            const listNode = document.getElementById('demo-accounts-list');
+            if (!listNode) return;
+            try {
+              const resp = await fetch('/api/demo-accounts');
+              const json = await resp.json();
+              if (!json.ok) throw new Error(json.message || 'Failed');
+              const accounts = json.data.accounts || [];
+              if (accounts.length === 0) { listNode.innerHTML = '<p>No demo accounts yet.</p>'; return; }
+              listNode.innerHTML = '';
+              for (const a of accounts.slice(0,10)) {
+                const div = document.createElement('div');
+                div.className = 'demo-account';
+                div.innerHTML = `<strong>${a.full_name}</strong><div>${a.phone_number}</div><div><button class='button button-secondary use-account' data-phone='${a.phone_number}'>Use This Account</button></div>`;
+                listNode.appendChild(div);
+              }
+              document.querySelectorAll('.use-account').forEach(btn=>btn.addEventListener('click', (ev)=>{
+                const phone = ev.currentTarget.dataset.phone;
+                useDemoAccount(phone);
+              }));
+            } catch (err) {
+              listNode.innerHTML = '<p>Error loading demo accounts.</p>';
+            }
+          };
+
+          const useDemoAccount = async (phone) => {
+            try {
+              // set local storage and server session then open chat
+              try { window.localStorage.setItem('awaj_session_phone', String(phone)); } catch (e){}
+              await fetch('/api/session-phone', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({phone}) });
+            } catch (e) {
+              // ignore
+            }
+            window.location.href = '/chat';
+          };
+
+          if (openBtn) openBtn.addEventListener('click', (e)=>{ showModal(); });
+          if (closeBtn) closeBtn.addEventListener('click', (e)=>{ hideModal(); });
+
+          document.addEventListener('click', (e) => {
+            if (e.target === modal) hideModal();
+          });
+
+          document.getElementById('generate-sample')?.addEventListener('click', async (e)=>{
+            // fetch sample payload
+            try {
+              const resp = await fetch('/api/generate-sample-customer');
+              const json = await resp.json();
+              if (!json.ok) throw new Error(json.message||'');
+              const s = json.data.sample || {};
+              // populate form fields
+              for (const k in s) {
+                const el = form.querySelector(`[name='${k}']`);
+                if (el) el.value = s[k];
+              }
+              messages.textContent = 'Sample customer generated in the form.';
+            } catch (err) {
+              messages.textContent = 'Could not generate sample customer.';
+            }
+          });
+
+          form.addEventListener('submit', async (e)=>{
+            e.preventDefault();
+            messages.textContent = '';
+            const data = {};
+            new FormData(form).forEach((v,k)=>{ data[k]=v; });
+            // basic client validation
+            if (!data.full_name || !data.phone_number) { messages.textContent = 'Name and phone are required.'; return; }
+            // expiry validation optional
+            if (data.expiry_date) {
+              const d = Date.parse(data.expiry_date);
+              if (Number.isNaN(d)) { messages.textContent = 'Expiry date is invalid.'; return; }
+            }
+            try {
+              const resp = await fetch('/api/create-test-account', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+              const json = await resp.json();
+              if (!json.ok) { messages.textContent = json.message || 'Failed to create account.'; return; }
+              const customer = json.data.customer;
+              messages.textContent = 'Test account created successfully.';
+              // update demo accounts list
+              await loadDemoAccounts();
+              // show quick actions
+              const actionArea = document.createElement('div');
+              actionArea.innerHTML = `<p><strong>Created:</strong> ${customer.full_name} (${customer.phone_number})</p><div><button class='button' id='copy-phone'>Copy Phone Number</button> <button class='button' id='open-chat'>Open Chat</button> <button class='button' id='check-balance'>Check Balance</button> <button class='button' id='view-package'>View Package</button></div>`;
+              messages.appendChild(actionArea);
+              document.getElementById('copy-phone').addEventListener('click', ()=>{ navigator.clipboard && navigator.clipboard.writeText(customer.phone_number); });
+              document.getElementById('open-chat').addEventListener('click', ()=>{ useDemoAccount(customer.phone_number); });
+              document.getElementById('check-balance').addEventListener('click', ()=>{ useDemoAccount(customer.phone_number); });
+              document.getElementById('view-package').addEventListener('click', ()=>{ useDemoAccount(customer.phone_number); });
+              // close modal after short delay
+              setTimeout(()=>{ hideModal(); }, 900);
+            } catch (err) {
+              messages.textContent = 'An error occurred while creating the test account.';
+            }
+          });
+
+          // initial load
+          document.addEventListener('DOMContentLoaded', ()=>{ loadDemoAccounts(); });
+        })();
+      </script>
+    </div>
+  </body>
+</html>

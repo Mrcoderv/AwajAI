@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-label="AwajAI architecture diagram">
+  <!-- Updated: 2026-05-30 by GPT-5 mini (extracted chat flow consolidation) -->
+  <defs>
+    <style>
+      .bg { fill: #f8f5ef; }
+      .panel { fill: #ffffff; stroke: #c9c4b8; stroke-width: 2; rx: 18; }
+      .title { font: 700 30px Georgia, serif; fill: #1f2933; }
+      .label { font: 700 22px Georgia, serif; fill: #1f2933; }
+      .text { font: 18px Georgia, serif; fill: #5c6773; }
+      .arrow { stroke: #0f766e; stroke-width: 5; fill: none; marker-end: url(#arrowhead); }
+      .accent { fill: #0f766e; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#0f766e" />
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1400" height="820"/>
+  <text class="title" x="60" y="70">AwajAI Code Map</text>
+
+  <rect class="panel" x="60" y="120" width="220" height="100"/>
+  <text class="label" x="85" y="165">User</text>
+  <text class="text" x="85" y="192">Voice input</text>
+
+  <rect class="panel" x="330" y="120" width="260" height="100"/>
+  <text class="label" x="355" y="165">Vapi Assistant</text>
+  <text class="text" x="355" y="192">Intent + tool routing</text>
+
+  <rect class="panel" x="650" y="120" width="300" height="100"/>
+  <text class="label" x="675" y="165">Django API Layer</text>
+  <text class="text" x="675" y="192">JSON endpoints</text>
+
+  <rect class="panel" x="1010" y="120" width="330" height="100"/>
+  <text class="label" x="1035" y="165">Apps</text>
+  <text class="text" x="1035" y="192">accounts • support • faq • core</text>
+
+  <line class="arrow" x1="280" y1="170" x2="330" y2="170"/>
+  <line class="arrow" x1="590" y1="170" x2="650" y2="170"/>
+  <line class="arrow" x1="950" y1="170" x2="1010" y2="170"/>
+
+  <rect class="panel" x="520" y="320" width="360" height="100"/>
+  <text class="label" x="545" y="365">SQLite Database</text>
+  <text class="text" x="545" y="392">Customer, package, and FAQ records</text>
+
+  <line class="arrow" x1="1175" y1="220" x2="700" y2="320"/>
+
+  <rect class="panel" x="60" y="500" width="580" height="190"/>
+  <text class="label" x="85" y="545">Backend Structure</text>
+  <text class="text" x="85" y="580">accounts → customer data</text>
+  <text class="text" x="85" y="612">support → conversation handling</text>
+  <text class="text" x="85" y="644">faq → knowledge base</text>
+  <text class="text" x="85" y="676">core → shared utilities and views</text>
+
+  <rect class="panel" x="720" y="500" width="620" height="190"/>
+  <text class="label" x="745" y="545">Tool Integration Flow</text>
+  <text class="text" x="745" y="580">User voice input → Vapi assistant → Django API call</text>
+  <text class="text" x="745" y="612">Response returned to AI → spoken back to user</text>
+  <text class="text" x="745" y="644">Short JSON responses power voice-first support</text>
+</svg>

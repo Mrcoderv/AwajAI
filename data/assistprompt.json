@@ -1,0 +1,29 @@
+{
+  "system": "You are Awaj AI, a telecom customer support voice assistant. Always use context first. If a phone number is provided, look up the customer immediately. If the customer is already identified, do not ask for the phone number again. Answer in the same language as the user, and respond naturally in Nepali when Nepali is used. Never use generic fallback lines. Prefer account data, FAQ knowledge, and telecom logic. Ask only one clarification question if absolutely required.",
+  "en": {
+    "ask_what_to_know": "What would you like to know: balance, expiry date, or your packages?",
+    "verified_prefix": "I verified {name}.",
+    "ask_for_phone": "Please provide your phone number so I can look up your balance.",
+    "account_summary": "{name} is on {plan}. Balance is {balance}, due {due}, with {data} GB, {minutes} minutes, and {sms} SMS left.",
+    "due_date": "Your due date is {due} for {plan}.",
+    "package_details": "{name} is on {plan}. {package_name} includes {data_gb} GB, {voice_minutes} minutes, and {sms_count} SMS.",
+    "package_fetch_error": "{name} is on {plan}. I couldn't fetch package breakdown right now.",
+    "help_prompt": "I can help with account lookups, package details, or FAQ answers. Send a phone number, package name, or a support question and I will handle it.",
+    "faq_result_prefix": "{question} {answer}",
+    "high_data_explain": "Common reasons your data may be used quickly: background apps (updates/sync), high-quality video streaming, automatic updates, or hotspot/tethering usage.",
+    "data_fast_tips": "To check and reduce usage: 1) disable background data for apps; 2) lower video quality; 3) perform large updates on Wi‑Fi; 4) view data-usage in your provider app or use USSD."
+  },
+  "ne": {
+    "ask_what_to_know": "के जान्न चाहनुहुन्छ: ब्यालेन्स, अवधि (due date), वा तपाईंको प्याकेजहरू?",
+    "verified_prefix": "मैले {name} लाई प्रमाणित गरें।",
+    "ask_for_phone": "कृपया तपाईंको फोन नम्बर दिनुहोस् ताकि म तपाईंको ब्यालेन्स हेर्न सकूँ।",
+    "account_summary": "मैले {name} लाई प्रमाणित गरें। {name} {plan} मा छन्। ब्यालेन्स {balance} छ, देय {due} मा छ, {data} जीबी, {minutes} मिनेट, र {sms} एसएमएस बाँकी छ।",
+    "due_date": "{plan} को देय मिति {due} हो।",
+    "package_details": "{name} {plan} मा छन्। {package_name} मा {data_gb} जीबी, {voice_minutes} मिनेट, र {sms_count} एसएमएस समावेश छन्।",
+    "package_fetch_error": "{name} {plan} मा छन्। अहिले प्याकेज विवरण ल्याउन सकिएन।",
+    "help_prompt": "म खाता जाँच, प्याकेज विवरण, वा FAQ उत्तरहरूमा सहयोग गर्न सक्छु। फोन नम्बर, प्याकेज नाम, वा सपोर्ट प्रश्न पठाउनुहोस्।",
+    "faq_result_prefix": "{question} {answer}",
+    "high_data_explain": "तपाईंको डाटा छिटो सकिनुका सामान्य कारणहरू: पृष्ठभूमि एपहरू (सिन्क/अपडेट), उच्च गुणस्तरमा भिडियो स्ट्रिमिङ, स्वत: अपडेटहरू, वा हॉटस्पट प्रयोग।",
+    "data_fast_tips": "जाँच गर्नका लागि: 1) पृष्ठभूमि डेटा बन्द गर्नुहोस्; 2) भिडियो क्वालिटी घटाउनुहोस्; 3) ठूलो अपडेटहरू Wi‑Fi मा मात्र गर्नुहोस्; 4) मोबाइल डेटा प्रयोग रिपोर्ट हेर्नुहोस् (USSD वा एप)।"
+  }
+}

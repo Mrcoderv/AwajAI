@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Awaj AI | Chat{% endblock %}
+
+{% load static %}
+{% block content %}
+<section class="panel chat-shell">
+  <div class="chat-grid">
+    <div class="chat-main">
+      <div class="chat-banner">
+        <div>
+          <p class="eyebrow">Telecom chat assistant</p>
+          <h1>Talk to Awaj AI like ChatGPT.</h1>
+          <p class="lede">Ask about accounts, packages, or FAQs in plain text. Turn on voice mode to hear replies or use the mic to speak your message.</p>
+        </div>
+        <div class="chat-status-pill" id="chat-status-pill">Text mode active</div>
+      </div>
+
+      <div class="chat-stream" id="chat-stream" aria-live="polite" aria-label="Conversation">
+        <article class="chat-bubble chat-bubble-assistant">
+          <strong>Awaj AI</strong>
+          <p>Hi, I can help with account checks, package details, or FAQ answers. Send a message or use the mic whenever you want to talk.</p>
+        </article>
+      </div>
+
+      <form class="chat-composer" id="chat-form">
+        {% include 'core/_quick_questions.html' %}
+        <label class="sr-only" for="chat-input">Message</label>
+        <textarea id="chat-input" class="chat-input" rows="4" placeholder="Ask about a phone number, package, or support question..."></textarea>
+        <div class="composer-actions">
+          <button class="button button-secondary" id="voice-toggle-button" type="button" aria-pressed="false">Voice mode off</button>
+          <button class="button button-secondary" id="lang-toggle-button" type="button" aria-pressed="false">Lang: Auto</button>
+          <button class="button button-secondary" id="voice-input-button" type="button">Use mic</button>
+          <button class="button button-primary" type="submit">Send</button>
+        </div>
+      </form>
+    </div>
+
+    <aside class="chat-sidebar">
+      <div class="chat-side-card demo-accounts-side">
+        <h2>Demo Accounts</h2>
+        <div id="demo-accounts-list">Loading demo accounts…</div>
+      </div>
+
+      <div class="chat-side-card">
+        <h2>Quick prompts</h2>
+        <div class="prompt-list">
+          <button class="prompt-chip" type="button" data-prompt="Check account for 9841234567">Check an account</button>
+          <button class="prompt-chip" type="button" data-prompt="Show package details for Smart">Show a package</button>
+          <button class="prompt-chip" type="button" data-prompt="What are the FAQ answers for data rollover?">Search FAQs</button>
+        </div>
+      </div>
+
+      <div class="chat-side-card">
+        <h2>Mic activity</h2>
+        <div class="voice-visual" id="voice-visual" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p class="side-copy" id="voice-copy">Press Use mic to start speech recognition in browsers that support it.</p>
+      </div>
+
+      <div class="chat-side-card">
+        <h2>Voice mode</h2>
+        <p class="side-copy">Voice mode speaks Awaj AI responses aloud. The mic button uses browser speech recognition when it is available.</p>
+      </div>
+
+      <div class="chat-side-card">
+        <h2>What it can do</h2>
+        <ul class="feature-list">
+          <li>Look up verified mock telecom accounts</li>
+          <li>Fetch package details by name or id</li>
+          <li>Search FAQ answers in natural language</li>
+        </ul>
+      </div>
+    </aside>
+  <script src="{% static 'js/chat.js' %}"></script>
+    });
+  })();
+</script>
+{% endblock %}

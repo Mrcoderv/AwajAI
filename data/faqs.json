@@ -1,0 +1,52 @@
+[
+  {
+    "question": "How do I check my data balance?",
+    "answer": "Dial *123# or ask Awaj AI to check your account with your phone number.",
+    "category": "Balance",
+    "is_published": true
+  },
+  {
+    "question": "मेरो डेटा ब्यालेन्स कसरी जाँच गर्ने?",
+    "answer": "डायल गर्नुहोस् *123# वा Awaj AI लाई तपाईंको फोन नम्बर पठाएर जाँच गर्न भन्नुहोस्।",
+    "category": "Balance",
+    "is_published": true
+  },
+  {
+    "question": "Can I roll over unused data?",
+    "answer": "Yes, unused data rolls over automatically for the next billing cycle on selected plans.",
+    "category": "Data",
+    "is_published": true
+  },
+  {
+    "question": "के प्रयोग नगरिएको डाटा रोल ओभर हुन्छ?",
+    "answer": "हो, रोजिएका केहि योजनाहरूमा प्रयोग नगरिएको डाटा अर्को बिलिङ चक्रमा रोल ओभर हुन्छ।",
+    "category": "Data",
+    "is_published": true
+  },
+  {
+    "question": "How do I change my plan?",
+    "answer": "You can change plans from the dashboard or contact customer care; I can check available packages if you tell me which one you want.",
+    "category": "Plans",
+    "is_published": true
+  }
+  ,
+  {
+    "question": "मैले कसरी मेरो प्लान परिवर्तन गर्ने?",
+    "answer": "ड्यासबोर्डबाट वा ग्राहक सेवा सम्पर्क गरेर योजना परिवर्तन गर्न सकिन्छ; कुन योजना चाहनुहुन्छ भने म उपलब्ध प्याकेज जाँच गर्छु।",
+    "category": "Plans",
+    "is_published": true
+  }
+  ,
+  {
+    "question": "Why is my data being used up so fast?",
+    "answer": "Common reasons include background apps syncing or updating, high-quality video streaming, automatic app updates, or hotspot/tethering usage. To reduce usage: disable background data, lower video quality, do large updates on Wi-Fi, and check your data-usage in the provider app.",
+    "category": "Data",
+    "is_published": true
+  },
+  {
+    "question": "मेरो डाटा किन छिटो सकियो?",
+    "answer": "तपाईंको डाटा छिटो सकिनुको सामान्य कारणहरू: पृष्ठभूमि एपहरू (सिन्क/अपडेट), उच्च गुणस्तरमा भिडियो स्ट्रिमिङ, स्वत: अपडेटहरू, वा हॉटस्पट प्रयोग। कम गर्न: पृष्ठभूमि डेटा बन्द गर्नुहोस्, भिडियो क्वालिटी घटाउनुहोस्, ठूला अपडेटहरू Wi‑Fi मा गर्नुहोस्, र प्रदायक एपबाट डेटा प्रयोग जाँच गर्नुहोस्।",
+    "category": "Data",
+    "is_published": true
+  }
+]

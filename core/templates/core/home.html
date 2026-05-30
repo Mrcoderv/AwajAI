@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Awaj AI | Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Telecom chat assistant</p>
+  <h1>Awaj AI keeps support simple.</h1>
+  <p class="lede">Use the chat page to ask questions like ChatGPT, then switch on voice mode whenever you want to speak or hear replies.</p>
+  <div class="cta-row">
+    <a class="button button-primary" href="{% url 'chat_page' %}">Open Chat</a>
+    <a class="button button-secondary" href="{% url 'dashboard' %}">View Dashboard</a>
+  </div>
+  <div class="status-card">
+    <span>Chat + voice</span>
+    <strong>ready</strong>
+  </div>
+</section>
+{% endblock %}

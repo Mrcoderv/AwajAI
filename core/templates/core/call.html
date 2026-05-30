@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Awaj AI | Call{% endblock %}
+
+{% block content %}
+<section class="panel layout-split">
+  <div>
+    <p class="eyebrow">Voice assistant</p>
+    <h1>Start a support call.</h1>
+    <p class="lede">Use the button to start a live voice demo. If Vapi is not connected yet, the page falls back to a browser-based call preview.</p>
+  </div>
+  <div class="voice-card">
+    <div class="voice-ring"></div>
+    <p id="voice-status">Press to begin speaking with Awaj AI.</p>
+    <button class="button button-primary button-large" id="voice-start-button" type="button">Call Awaj AI</button>
+    <p class="voice-hint">Voice demo uses your browser microphone when available.</p>
+    <div class="voice-transcript" id="voice-transcript" aria-live="polite"></div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const startButton = document.getElementById("voice-start-button");
+    const statusNode = document.getElementById("voice-status");
+    const transcriptNode = document.getElementById("voice-transcript");
+
+    const speak = (text) => {
+      if (!window.speechSynthesis) {
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    };
+
+    const setTranscript = (heading, body) => {
+      transcriptNode.innerHTML = `<strong>${heading}</strong><p>${body}</p>`;
+    };
+
+    startButton.addEventListener("click", () => {
+      statusNode.textContent = "Awaj AI is listening...";
+      setTranscript("Call started", "Awaj AI is ready for a telecom question.");
+      speak("Hi, I'm AwajAI. How can I help you today?");
+
+      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Recognition) {
+        statusNode.textContent = "Browser voice support is limited, so this is a visual call demo.";
+        setTranscript("Fallback mode", "Your browser does not support speech recognition, but the call page is working and ready for Vapi integration.");
+        return;
+      }
+
+      const recognition = new Recognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript;
+        setTranscript("You said", spokenText);
+        statusNode.textContent = "Processing your request...";
+
+        const lowerText = spokenText.toLowerCase();
+        let reply = "I can help with that. Please share your phone number so I can check the account.";
+
+        if (lowerText.includes("package")) {
+          reply = "I can check package details. Please tell me the package name or the phone number.";
+        } else if (lowerText.includes("faq") || lowerText.includes("how") || lowerText.includes("help")) {
+          reply = "I can search the FAQ for that. What would you like to know?";
+        } else if (lowerText.match(/\d{7,}/)) {
+          reply = "Thanks. I have the phone number. I will check the account next.";
+        }
+
+        setTranscript("Awaj AI", reply);
+        statusNode.textContent = "Ready for the next question.";
+        speak(reply);
+      };
+
+      recognition.onerror = () => {
+        statusNode.textContent = "Voice input could not start. Please try again.";
+        setTranscript("Voice error", "The browser blocked microphone access or voice capture is unavailable.");
+      };
+
+      recognition.onend = () => {
+        if (statusNode.textContent === "Awaj AI is listening...") {
+          statusNode.textContent = "Listening ended.";
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (error) {
+        statusNode.textContent = "Voice input could not start.";
+        setTranscript("Voice error", "The browser could not start microphone capture.");
+      }
+    });
+  })();
+</script>
+{% endblock %}
