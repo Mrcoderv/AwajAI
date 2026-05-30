@@ -6,12 +6,14 @@ These views stay thin and delegate business logic to app services.
 from django.views.decorators.csrf import csrf_exempt
 
 from django.http import JsonResponse
+import logging
 
 from accounts.services import get_telconnect_account
 from core.exceptions import AppError, ValidationError, NotFoundError
 from core.services import lookup_package
 from faq.services import search_faqs
 from core.json_data import load_json
+from support.services import create_support_ticket, get_ticket_details, format_ticket_confirmation
 import json
 from accounts.services import create_test_account
 from datetime import datetime
@@ -159,6 +161,7 @@ def assist_prompts(request):
     return _tool_response("assist_prompts", "", data)
 
 
+@csrf_exempt
 def session_phone(request):
     """Get, set, or clear the verified session phone stored in Django session.
 
@@ -224,6 +227,48 @@ def quick_questions(request):
     return _tool_response("quick_questions", "", data)
 
 
+@csrf_exempt
+def support_ticket(request):
+    """Create a support ticket or fetch an existing one from JSON storage."""
+    if request.method == "GET":
+        ticket_id = request.GET.get("ticket_id")
+        phone = request.GET.get("phone")
+        try:
+            ticket = get_ticket_details(ticket_id=ticket_id, phone=phone)
+        except NotFoundError as exc:
+            return _tool_error("support_ticket", str(exc), status=404, ticket_id=ticket_id, phone=phone)
+        except AppError as exc:
+            return _tool_error("support_ticket", str(exc), status=500)
+        except Exception:
+            return _tool_error("support_ticket", "Unexpected server error.", status=500)
+
+        return _tool_response("support_ticket", format_ticket_confirmation(ticket), ticket)
+
+    if request.method != "POST":
+        return _tool_error("support_ticket", "Method not allowed", status=405, allowed_methods=["GET", "POST"])
+
+    body = {}
+    try:
+        body = json.loads(request.body.decode("utf-8") or "{}")
+    except Exception:
+        body = request.POST.dict() if request.POST else {}
+
+    issue = (body.get("issue") or body.get("problem") or "").strip()
+    phone = (body.get("phone") or body.get("phone_number") or "").strip()
+    customer_name = (body.get("customer_name") or body.get("name") or "").strip()
+
+    try:
+        ticket = create_support_ticket(issue=issue or "Network connectivity", phone=phone, customer_name=customer_name, conversation_state=body.get("conversation_state") if isinstance(body.get("conversation_state"), dict) else None)
+    except ValidationError as exc:
+        return _tool_error("support_ticket", str(exc), status=400)
+    except AppError as exc:
+        return _tool_error("support_ticket", str(exc), status=500)
+    except Exception:
+        return _tool_error("support_ticket", "Unexpected server error.", status=500)
+
+    return _tool_response("support_ticket", format_ticket_confirmation(ticket), ticket)
+
+
 def demo_accounts(request):
     """Return the list of demo/test customers for UI display."""
     if request.method != "GET":
@@ -245,6 +290,7 @@ def demo_accounts(request):
     return _tool_response("demo_accounts", "", {"count": len(out), "accounts": out})
 
 
+@csrf_exempt
 def create_test_account_view(request):
     """API endpoint to create a new test customer (appends to data/customers.json)."""
     if request.method != "POST":

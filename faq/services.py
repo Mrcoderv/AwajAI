@@ -3,6 +3,7 @@
 from core.json_data import load_json
 from core.exceptions import NotFoundError, ServiceError, ValidationError
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,12 @@ KEYWORD_TERMS = [
 ]
 
 
+def _normalize_text(value):
+    text = (value or "").strip().lower()
+    text = re.sub(r"[^\w\u0900-\u097F]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def search_faqs(query):
     """Return up to three published FAQ matches for a search query.
 
@@ -48,6 +55,7 @@ def search_faqs(query):
         raise NotFoundError("No FAQ records are available yet.")
 
     logger.debug("FAQ QUERY: %s", normalized_query)
+    query_norm = _normalize_text(normalized_query)
 
     # Compute a similarity score for each FAQ and pick the best one.
     scored = []
@@ -59,13 +67,24 @@ def search_faqs(query):
         answer = (faq.get("answer") or "").strip()
         category = (faq.get("category") or "").strip()
         text_blob = " ".join(filter(None, [question, answer, category]))
+        question_norm = _normalize_text(question)
+        text_norm = _normalize_text(text_blob)
 
         # base similarity
-        score = _similarity(normalized_query, text_blob)
+        score = _similarity(query_norm, text_norm)
 
-        # boost to 1.0 for clear keyword presence (ensures correct mapping for known terms)
-        keyword_hit = any(kw in q_lower or kw in question.lower() or kw in answer.lower() or kw in category.lower() for kw in KEYWORD_TERMS)
-        substring_hit = q_lower in question.lower() or q_lower in answer.lower() or q_lower in category.lower()
+        # Exact or near-exact question matches should always win over keyword overlap.
+        if query_norm and query_norm == question_norm:
+            score = 1.1
+        elif query_norm and (query_norm in question_norm or question_norm in query_norm):
+            score = max(score, 1.05)
+
+        # boost only when the same keyword appears in both the query and the FAQ record
+        keyword_hit = any(
+            kw in q_lower and kw in text_blob.lower()
+            for kw in KEYWORD_TERMS
+        )
+        substring_hit = query_norm in text_norm or text_norm in query_norm
         if keyword_hit or substring_hit:
             score = max(score, 1.0)
 

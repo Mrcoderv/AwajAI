@@ -14,6 +14,7 @@
     recognition: null,
     preferredLang: "auto", // 'auto' | 'en' | 'ne'
     lastAccount: null,
+    supportState: { step: null, ticketId: null, lastIssue: null },
     // Load persisted session phone from localStorage so verification survives reloads
     sessionPhone: window.localStorage.getItem('awaj_session_phone') || null,
   };
@@ -267,6 +268,18 @@
     return false;
   };
 
+  const isExplicitAccountQuery = (text) => {
+    if (!text) return false;
+    const t = text.trim().toLowerCase();
+    if (/^\d{7,15}$/.test(t)) return true;
+    if (t === 'balance' || t === 'package' || t === 'expiry') return true;
+    if (t.startsWith('check account')) return true;
+    if (t.startsWith('check my balance')) return true;
+    if (t.startsWith('show my package')) return true;
+    if (t.startsWith('when does my plan expire')) return true;
+    return false;
+  };
+
   // Minimal fallback messages in case assistprompt.json cannot be fetched.
   const FALLBACK = {
     en: {
@@ -395,6 +408,7 @@
 
   const SUPPORT_TERMS = [
     'internet','slow','network','signal','not working','speed','connection','network issue','internet not working',
+    'contact support','customer support','customer care','support',
     // Nepali
     'इन्टरनेट','इन्टरनेट चल्दैन','नेटवर्क','सिग्नल','छिटो छैन','जडान','सर्भर'
   ];
@@ -480,6 +494,32 @@
     return payload;
   };
 
+  const postJson = async (url, body) => {
+    const csrf = getCookie('csrftoken');
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: Object.assign(
+        { 'Content-Type': 'application/json', Accept: 'application/json' },
+        csrf ? { 'X-CSRFToken': csrf } : {}
+      ),
+      body: JSON.stringify(body || {}),
+      credentials: 'same-origin',
+    });
+
+    let payload = null;
+    try {
+      payload = await response.json();
+    } catch (error) {
+      payload = null;
+    }
+
+    if (!response.ok) {
+      throw new Error((payload && payload.message) || 'The assistant could not reach the service.');
+    }
+
+    return payload;
+  };
+
   const sendIntentLog = async (payload) => {
     try {
       const csrf = getCookie('csrftoken');
@@ -510,7 +550,90 @@
     // send initial intent telemetry for tuning
     try { await sendIntentLog({ message: normalized, intent: detectedIntent, confidence: intentConfidence, route: 'detected' }); } catch (e) {}
 
+    const isGreeting = () => /^(hi|hello|hey|namaste|namaskar|नमस्ते)\b/i.test(normalized);
+    const isThanks = () => /^(thanks|thank you|thx|धन्यवाद|dhanayabad)\b/i.test(lower);
+    const supportsTicketFlow = Boolean(state.supportState && state.supportState.ticketId);
+    const supportIssueFromText = () => {
+      if (/(network|internet|signal|data|slow)/i.test(lower)) return 'Network connectivity';
+      if (/call/i.test(lower)) return 'Call service issue';
+      if (/sms|message/i.test(lower)) return 'SMS delivery issue';
+      return 'Network connectivity';
+    };
+
+    if (isGreeting() && !supportsTicketFlow && !state.sessionPhone) {
+      const lang = detectLangFromInput(normalized);
+      return lang === 'ne'
+        ? 'नमस्ते! म AwajAI हुँ। म account information, packages, internet issues, र telecom FAQs मा मद्दत गर्न सक्छु। म तपाईंलाई कसरी सहयोग गरूँ?'
+        : "Hello! I'm AwajAI. I can help with account information, packages, internet issues, and telecom FAQs. How can I assist you today?";
+    }
+
+    if (/(check ticket|ticket details|my ticket|support ticket status)/i.test(lower)) {
+      try {
+        const ticketResponse = await fetchJson(`/api/support-ticket${state.supportState.ticketId ? `?ticket_id=${encodeURIComponent(state.supportState.ticketId)}` : state.sessionPhone ? `?phone=${encodeURIComponent(state.sessionPhone)}` : ''}`);
+        const ticket = ticketResponse.data || {};
+        state.supportState = { step: 'ticket_created', ticketId: ticket.ticket_id || state.supportState.ticketId, lastIssue: ticket.issue || state.supportState.lastIssue };
+        const lang = detectLangFromInput(normalized);
+        return lang === 'ne'
+          ? `तपाईंको टिकट ${ticket.ticket_id} खुला छ। Issue: ${ticket.issue}. हाम्रो support team ले चाँडै सम्पर्क गर्नेछ।`
+          : `Your ticket ${ticket.ticket_id} is open. Issue: ${ticket.issue}. Our support team will contact you shortly.`;
+      } catch (err) {
+        return state.sessionPhone
+          ? 'I could not find an open ticket yet. Say "create support ticket" if you want me to open one.'
+          : 'I could not find an open ticket yet. Say "create support ticket" if you want me to open one.';
+      }
+    }
+
+    if (isThanks() && state.supportState.ticketId) {
+      try {
+        const ticketResponse = await fetchJson(`/api/support-ticket?ticket_id=${encodeURIComponent(state.supportState.ticketId)}`);
+        const ticket = ticketResponse.data || {};
+        const lang = detectLangFromInput(normalized);
+        return lang === 'ne'
+          ? `तपाईंलाई स्वागत छ। तपाईंको टिकट ${ticket.ticket_id} अहिले ${String(ticket.status || 'Open').toLowerCase()} छ।`
+          : `You're welcome. Your ticket ${ticket.ticket_id} is currently ${String(ticket.status || 'Open').toLowerCase()}.`;
+      } catch (err) {
+        return 'You are welcome. If you need anything else, I can check your ticket or help with telecom support.';
+      }
+    }
+
+    if (/(create support ticket|open a ticket|create ticket|raise a ticket)/i.test(lower)) {
+      try {
+        const ticketResponse = await postJson('/api/support-ticket', {
+          issue: state.supportState.lastIssue || supportIssueFromText(),
+          phone: state.sessionPhone || '',
+          customer_name: state.lastAccount && state.lastAccount.customer_name ? state.lastAccount.customer_name : '',
+          conversation_state: state.supportState,
+        });
+        const ticket = ticketResponse.data || {};
+        state.supportState = { step: 'ticket_created', ticketId: ticket.ticket_id, lastIssue: ticket.issue || 'Network connectivity' };
+        const lang = detectLangFromInput(normalized);
+        return lang === 'ne'
+          ? `सपोर्ट टिकट सफलतापूर्वक सिर्जना भयो।\n\nTicket ID: ${ticket.ticket_id}\nIssue: ${ticket.issue}\nStatus: ${ticket.status || 'Open'}\n\nहाम्रो support team चाँडै सम्पर्क गर्नेछ।`
+          : `Support ticket created successfully.\n\nTicket ID: ${ticket.ticket_id}\nIssue: ${ticket.issue}\nStatus: ${ticket.status || 'Open'}\n\nOur support team will contact you shortly.`;
+      } catch (err) {
+        const lang = detectLangFromInput(normalized);
+        return lang === 'ne'
+          ? 'म अहिले टिकट सिर्जना गर्न सकिनँ। कृपया केही बेरपछि फेरि प्रयास गर्नुहोस्।'
+          : 'I could not create the ticket right now. Please try again in a moment.';
+      }
+    }
+
     // ROUTING PRIORITY: 1) verified-account 2) support 3) faq 4) general 5) fallback
+    // Question-shaped FAQ requests should be resolved before account follow-up routing.
+    if (isLikelyFaqQuestion(normalized) && !isExplicitAccountQuery(normalized)) {
+      try { console.log('[AwajAI] routing: early_faq_search'); } catch (e) {}
+      try {
+        const faqResponse = await fetchJson(`/api/faq?q=${encodeURIComponent(parseFaqQuery(normalized))}`);
+        const firstResult = (faqResponse.data && faqResponse.data.results && faqResponse.data.results[0]) || null;
+        if (firstResult) {
+          const lang = detectLangFromInput(normalized);
+          return localize("faq_result_prefix", { question: firstResult.question, answer: firstResult.answer }, lang);
+        }
+      } catch (err) {
+        // fall through to the normal router if FAQ lookup cannot resolve the prompt
+      }
+    }
+
     // 1) Verified account requests
     if (state.sessionPhone && ['balance','expiry','package'].includes(detectedIntent)) {
       try {
@@ -566,23 +689,32 @@
       try { console.log('[AwajAI] routing: support (prioritized)'); } catch (e) {}
       state.lastIntent = 'support';
       state.intentConfidence = intentConfidence;
-      // start or continue support troubleshooting flow
-      const supportState = state.supportState || { step: 0 };
-      // simple conversational progression
-      if (!supportState.step) {
-        state.supportState = { step: 1 };
-        try { await sendIntentLog({ message: normalized, intent: 'support', confidence: intentConfidence, route: 'support_start', support_state: state.supportState }); } catch (e) {}
+      if (lower.includes('contact support') || lower.includes('customer care') || lower.includes('customer support')) {
+        state.supportState = { step: 'escalation_offer', ticketId: state.supportState.ticketId || null, lastIssue: state.supportState.lastIssue || supportIssueFromText() };
         return respLang === 'ne'
-          ? 'तपाईंको इन्टरनेट काम गरिरहेको छैन भन्ने बुझिए। कृपया निम्न जाँचहरू प्रयास गर्नुहोस्:\n1) एयरप्लेन मोड अन/अफ गर्नुहोस्.\n2) फोन रिस्टार्ट गर्नुहोस्.\n3) खुला क्षेत्रमा सर्नुहोस्।\n4) यदि वाई-फाइमा हुनुहुन्छ भने वाई-फाइ चेक गर्नुहोस्।\nयदि समस्या कायम छ भने म तपाईंलाई सपोर्टमा जोडिदिन सक्छु।'
-          : 'I understand your internet is not working. Please try:\n1) Toggle airplane mode on/off.\n2) Restart your phone.\n3) Move to an open area.\n4) If on Wi‑Fi, check your router.\nIf this continues, I can connect you to customer support.';
-      } else {
-        // continue flow — offer escalation
-        state.supportState.step += 1;
-        try { await sendIntentLog({ message: normalized, intent: 'support', confidence: intentConfidence, route: 'support_continue', support_state: state.supportState }); } catch (e) {}
-        return respLang === 'ne'
-          ? 'म बुझ्छु समस्या जारी छ। म सपोर्ट टिकट सिर्जना गर्न सक्छु वा प्रत्यक्ष एजेन्टमा जोड्न सक्छु — के चाहनुहुन्छ?'
-          : 'I understand the issue continues. I can create a support ticket or connect you to a live agent — which would you prefer?';
+          ? 'म तपाईंलाई ग्राहक सेवामा जोड्न सक्छु वा सपोर्ट टिकट सिर्जना गर्न सक्छु। चाहनुहुन्छ भने “create support ticket” भन्नुहोस्।'
+          : 'I can connect you to customer support or create a support ticket. Say "create support ticket" if you want me to open one.';
       }
+
+      if (/(network issue|network issues|internet issue|internet not working|no network|no signal|signal weak|data not working)/i.test(lower)) {
+        state.supportState = { step: 'troubleshooting', ticketId: state.supportState.ticketId || null, lastIssue: supportIssueFromText() };
+        try { await sendIntentLog({ message: normalized, intent: 'support', confidence: intentConfidence, route: 'support_troubleshooting', support_state: state.supportState }); } catch (e) {}
+        return respLang === 'ne'
+          ? 'तपाईंको समस्या network सम्बन्धी देखिन्छ। कृपया एयरप्लेन मोड अन/अफ गर्नुहोस्, फोन रिस्टार्ट गर्नुहोस्, र खुला क्षेत्रमा सर्नुहोस्। अझै समस्या छ भने म टिकट सिर्जना गर्न सक्छु।'
+          : 'This looks like a network issue. Please toggle airplane mode on/off, restart your phone, and move to an open area. If it still does not work, I can create a support ticket.';
+      }
+
+      if (/(still not working|not working|same issue|issue remains|no change)/i.test(lower)) {
+        state.supportState = { step: 'escalation_offer', ticketId: state.supportState.ticketId || null, lastIssue: state.supportState.lastIssue || 'Network connectivity' };
+        try { await sendIntentLog({ message: normalized, intent: 'support', confidence: intentConfidence, route: 'support_escalation_offer', support_state: state.supportState }); } catch (e) {}
+        return respLang === 'ne'
+          ? 'समस्या जारी रहेछ। म सपोर्ट टिकट सिर्जना गर्न सक्छु वा live agent मा जोड्न सक्छु — के चाहनुहुन्छ?'
+          : 'The issue is still continuing. I can create a support ticket or connect you to a live agent — which would you prefer?';
+      }
+
+      return respLang === 'ne'
+        ? 'म तपाईंलाई internet/network समस्या र support ticket मा मद्दत गर्न सक्छु। कृपया समस्या अलि स्पष्ट रूपमा लेख्नुहोस्।'
+        : 'I can help with internet and network issues or create a support ticket. Please describe the issue a little more clearly.';
     }
 
     // Handle follow-up questions that refer to the last verified account
@@ -746,11 +878,22 @@
       return localize("help_prompt", {}, lang);
     }
 
+    if (/^(hi|hello|hey|namaste|namaskar|नमस्ते)\b/i.test(normalized)) {
+      return respLang === 'ne'
+        ? 'नमस्ते! म AwajAI हुँ। म account information, packages, internet issues, र telecom FAQs मा मद्दत गर्न सक्छु। म तपाईंलाई कसरी सहयोग गरूँ?'
+        : "Hello! I'm AwajAI. I can help with account information, packages, internet issues, and telecom FAQs. How can I assist you today?";
+    }
+
     // Prefer a concise telecom-specific question instead of a generic fallback.
     const lang = detectLangFromInput(normalized);
+    if (/^(nitric acid|apple pie|weather|movie|politics|football)$/i.test(normalized)) {
+      return lang === "ne"
+        ? "म telecom support र account assistance मा मद्दत गर्छु। कृपया telecom सम्बन्धी प्रश्न सोध्नुहोस्।"
+        : "I specialize in telecom support and account assistance. Could you ask a telecom-related question?";
+    }
     return lang === "ne"
-      ? "म तपाईंको ब्यालेन्स, प्याकेज वा म्याद सम्बन्धी जानकारी दिन सक्छु। कृपया आफ्नो प्रश्न अलि स्पष्ट रूपमा लेख्नुहोस्।"
-      : "I can provide your balance, package, or expiry details — please clarify your question.";
+      ? "म telecom support र account assistance मा मद्दत गर्छु। कृपया telecom सम्बन्धी प्रश्न सोध्नुहोस्।"
+      : "I specialize in telecom support and account assistance. Could you ask a telecom-related question?";
   };
 
   const handleAssistantResponse = async (messageText) => {

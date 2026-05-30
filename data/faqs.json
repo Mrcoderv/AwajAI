@@ -48,5 +48,41 @@
     "answer": "तपाईंको डाटा छिटो सकिनुको सामान्य कारणहरू: पृष्ठभूमि एपहरू (सिन्क/अपडेट), उच्च गुणस्तरमा भिडियो स्ट्रिमिङ, स्वत: अपडेटहरू, वा हॉटस्पट प्रयोग। कम गर्न: पृष्ठभूमि डेटा बन्द गर्नुहोस्, भिडियो क्वालिटी घटाउनुहोस्, ठूला अपडेटहरू Wi‑Fi मा गर्नुहोस्, र प्रदायक एपबाट डेटा प्रयोग जाँच गर्नुहोस्।",
     "category": "Data",
     "is_published": true
+  },
+  {
+    "question": "How do I activate roaming?",
+    "answer": "Enable roaming from your phone settings, then make sure roaming is switched on in your Awaj AI account settings or contact support if your line still does not register abroad.",
+    "category": "Roaming",
+    "is_published": true
+  },
+  {
+    "question": "How can I recharge my account?",
+    "answer": "You can recharge through the mobile app, a voucher code, online banking, or any authorized retailer. If you want, I can also help you check the current packages before recharging.",
+    "category": "Recharge",
+    "is_published": true
+  },
+  {
+    "question": "How do I recharge my account?",
+    "answer": "You can recharge through the mobile app, a voucher code, online banking, or any authorized retailer. If you want, I can also help you check the current packages before recharging.",
+    "category": "Recharge",
+    "is_published": true
+  },
+  {
+    "question": "What happens if my balance is low?",
+    "answer": "When your balance is low, data and calls may stop working or be restricted until you recharge. I can help you check the current balance or suggest the right recharge option.",
+    "category": "Balance",
+    "is_published": true
+  },
+  {
+    "question": "मेरो प्लान कहिले सकिन्छ?",
+    "answer": "तपाईंको प्लानको म्याद समाप्त हुने मिति हेर्न सक्नुहुन्छ। Awaj AI ले तपाईंको current plan र due date देखाउन सक्छ।",
+    "category": "Plans",
+    "is_published": true
+  },
+  {
+    "question": "मैले आफ्नो प्लान कसरी परिवर्तन गर्ने?",
+    "answer": "ड्यासबोर्डबाट वा ग्राहक सेवा सम्पर्क गरेर आफ्नो प्लान परिवर्तन गर्न सकिन्छ। चाहनुहुन्छ भने उपलब्ध प्याकेज म देखाउँछु।",
+    "category": "Plans",
+    "is_published": true
   }
 ]

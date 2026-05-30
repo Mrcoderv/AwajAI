@@ -1,6 +1,6 @@
 # AwajAI
 
-AwajAI is a Django-based telecom voice customer support assistant built for voice-first customer care. It is designed to work with Vapi or a similar voice AI platform and supports short, conversational, tool-based responses in English and Nepali.
+AwajAI is a Django-based voice-first customer support assistant for telecom use-cases. It provides a lightweight webhook and JSON APIs designed to integrate with voice platforms (for example Vapi) and supports short, conversational responses in English and Nepali.
 
 ## What the system does
 
@@ -13,6 +13,7 @@ AwajAI can:
 - search FAQ answers
 - maintain short conversational flow with follow-up questions
 - respond in English or Nepali based on the user
+- show the architecture directly in the `/code-map` SVG page
 
 ## Tech Stack
 
@@ -28,6 +29,7 @@ AwajAI can:
 - `support` - conversation flow support and assistant-facing behavior
 - `faq` - FAQ knowledge-base models and search logic
 - `core` - shared utilities, frontend pages, and architecture views
+- `static/docs/code-map.svg` - reusable SVG architecture diagram for the code map page
 
 ## How It Works
 
@@ -49,6 +51,16 @@ Tool flow:
 - FAQ search with short voice-friendly answers
 - code map page for system design explanation
 - dashboard page for viewing customer data
+
+## Sample Mock Accounts
+
+These test accounts are seeded in `data/customers.json` so evaluators can try the app immediately.
+
+| Phone Number | Name | Status |
+| --- | --- | --- |
+| `9866412176` | Raghav Panthi | active |
+| `9857654321` | Sadhana Neupane | active |
+| `9801112233` | Ramesh Thapa | inactive |
 
 ## Frontend Pages
 
@@ -90,40 +102,39 @@ A JSON response with:
 This webhook uses the existing mock lookup logic (account/package/FAQ) already implemented in `accounts/services.py`, `core/services.py`, and `faq/services.py`.
 
 
-## Setup Instructions
+## Quick Start
 
-### 1. Create and activate the virtual environment
+1. Create and activate a Python virtual environment:
 
 ```bash
 python3 -m venv .venv
-. .venv/bin/activate
+source .venv/bin/activate
 ```
 
-### 2. Install dependencies
+2. Install dependencies:
 
 ```bash
-pip install django
+pip install -r requirements.txt
 ```
 
-### 3. Run migrations
+3. Apply migrations and load example data (if needed):
 
 ```bash
-python manage.py makemigrations
 python manage.py migrate
+# optionally seed example data (data/*.json or custom fixtures)
 ```
 
-### 4. Run the development server
+4. Run the development server:
 
 ```bash
 python manage.py runserver
 ```
 
-### 5. Open the app
-
-- Home: `http://127.0.0.1:8000/`
-- Call page: `http://127.0.0.1:8000/call/`
-- Dashboard: `http://127.0.0.1:8000/dashboard/`
-- Code map: `http://127.0.0.1:8000/code-map`
+Open the app in your browser:
+- Home: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+- Call page: [http://127.0.0.1:8000/call/](http://127.0.0.1:8000/call/)
+- Dashboard: [http://127.0.0.1:8000/dashboard/](http://127.0.0.1:8000/dashboard/)
+- Code map: [http://127.0.0.1:8000/code-map](http://127.0.0.1:8000/code-map)
 
 ## Example Data Flow
 
@@ -171,6 +182,7 @@ A downloadable SVG architecture diagram is also included at `static/docs/code-ma
 - supporting bilingual English/Nepali behavior naturally
 - making the project understandable to non-technical reviewers
 - designing a visual code map for system explanation
+- handling Vapi webhook timing while keeping assistant response latency low
 
 ## Demo Video
 
@@ -181,6 +193,33 @@ A 3-5 minute demo video should be recorded separately for submission. It should 
 - the dashboard
 - the code map page
 - one sample API/tool flow
+
+## Running Tests
+
+Run the Django test suite:
+
+```bash
+python manage.py test
+```
+
+## Contributing
+
+- Use the existing project structure to add features: `accounts`, `support`, `faq`, `core`.
+- Please open issues or PRs with clear reproduction steps and the target branch `main`.
+
+## GitHub And Vercel Deploy
+
+1. Make sure the repo is clean locally and the virtual environment plus SQLite file are ignored.
+2. Commit the code changes and push to GitHub.
+3. Import the GitHub repo into Vercel.
+4. Vercel will use `api/index.py` and `vercel.json` to serve the Django app.
+5. Set secrets such as `SECRET_KEY` and any Vapi keys in the Vercel project settings.
+
+If you want the deployed site to use different hostnames, set `ALLOWED_HOSTS` in Vercel to include them.
+
+## License
+
+This repository does not include an explicit license file. If you plan to publish or share this project, add a `LICENSE` file (for example MIT or Apache-2.0) to clarify reuse terms.
 
 ## Submission Checklist
 

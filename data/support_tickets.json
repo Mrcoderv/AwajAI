@@ -1,0 +1,70 @@
+[
+  {
+    "ticket_id": "TKT-1024",
+    "issue": "Network connectivity",
+    "status": "Open",
+    "phone_number": "",
+    "customer_name": "",
+    "created_at": "2026-05-30T07:33:48Z",
+    "updated_at": "2026-05-30T07:33:48Z",
+    "source": "chat",
+    "conversation_state": {
+      "flow": "support",
+      "support_step": "escalation_offer",
+      "last_support_issue": "Network connectivity",
+      "last_ticket_id": null,
+      "language": null
+    }
+  },
+  {
+    "ticket_id": "TKT-1025",
+    "issue": "Network connectivity",
+    "status": "Open",
+    "phone_number": "",
+    "customer_name": "",
+    "created_at": "2026-05-30T07:34:31Z",
+    "updated_at": "2026-05-30T07:34:31Z",
+    "source": "chat",
+    "conversation_state": {
+      "flow": "support",
+      "support_step": "escalation_offer",
+      "last_support_issue": "Network connectivity",
+      "last_ticket_id": null,
+      "language": null
+    }
+  },
+  {
+    "ticket_id": "TKT-1026",
+    "issue": "Network connectivity",
+    "status": "Open",
+    "phone_number": "",
+    "customer_name": "",
+    "created_at": "2026-05-30T07:34:59Z",
+    "updated_at": "2026-05-30T07:34:59Z",
+    "source": "chat",
+    "conversation_state": {
+      "flow": "support",
+      "support_step": "escalation_offer",
+      "last_support_issue": "Network connectivity",
+      "last_ticket_id": null,
+      "language": null
+    }
+  },
+  {
+    "ticket_id": "TKT-1027",
+    "issue": "Network connectivity",
+    "status": "Open",
+    "phone_number": "",
+    "customer_name": "",
+    "created_at": "2026-05-30T07:35:39Z",
+    "updated_at": "2026-05-30T07:35:39Z",
+    "source": "chat",
+    "conversation_state": {
+      "flow": "support",
+      "support_step": "escalation_offer",
+      "last_support_issue": "Network connectivity",
+      "last_ticket_id": null,
+      "language": null
+    }
+  }
+]
