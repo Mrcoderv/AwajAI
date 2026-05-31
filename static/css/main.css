@@ -403,6 +403,14 @@ body {
   gap: 0.9rem;
 }
 
+/* Ensure embedded SVG in code-map has visible dimensions */
+.architecture-embed .code-map-svg {
+  width: 100%;
+  height: 520px;
+  display: block;
+  border: none;
+}
+
 .flow-row {
   display: flex;
   align-items: center;

@@ -18,7 +18,6 @@ AwajAI can:
 ## Tech Stack
 
 - Django for backend and template-based frontend
-- SQLite for development data storage
 - HTML/CSS for the UI
 - Vapi-ready voice assistant flow
 - JSON APIs for tool integration
@@ -35,7 +34,7 @@ AwajAI can:
 
 Voice flow:
 
-`User Voice Input -> Vapi Assistant -> Django API -> Database -> Response -> Spoken Reply`
+`User Voice Input -> Vapi Assistant -> Django API -> Database {json template}-> Response -> Spoken Reply`
 
 Tool flow:
 
@@ -56,11 +55,11 @@ Tool flow:
 
 These test accounts are seeded in `data/customers.json` so evaluators can try the app immediately.
 
-| Phone Number | Name | Status |
-| --- | --- | --- |
-| `9866412176` | Raghav Panthi | active |
-| `9857654321` | Sadhana Neupane | active |
-| `9801112233` | Ramesh Thapa | inactive |
+| Phone Number   | Name            | Status   |
+| -------------- | --------------- | -------- |
+| `9866412176` | Raghav Panthi   | active   |
+| `9857654321` | Sadhana Neupane | active   |
+| `9801112233` | Ramesh Thapa    | inactive |
 
 ## Frontend Pages
 
@@ -87,20 +86,50 @@ To support a real Vapi voice agent, the repo exposes a webhook endpoint that Vap
 - `POST /api/vapi-webhook`
 
 ### What it expects
+
 A JSON body containing a transcript of the latest user speech/text.
 
 Common keys supported by this handler:
+
 - `transcript`, `text`, `utterance`, `message`
 
 ### What it returns
+
 A JSON response with:
+
 - `reply`: the assistant text to speak back
 - `language`: best-effort `en` or `ne`
 - optional `data` for debugging (`account` / `package` / `faq`)
 
 ### Wiring note
+
 This webhook uses the existing mock lookup logic (account/package/FAQ) already implemented in `accounts/services.py`, `core/services.py`, and `faq/services.py`.
 
+### Implementation & testing
+
+- Location: the webhook handler is implemented in `awaj_ai/vapi_views.py` and wired in `awaj_ai/urls.py` as `path("api/vapi-webhook", vapi_webhook, name="vapi_webhook")`.
+- What it expects: a JSON `POST` with a transcript field such as `transcript`, `text`, or `utterance`.
+- Example curl test (local server):
+
+```bash
+# basic transcript test
+curl -s -X POST http://127.0.0.1:8000/api/vapi-webhook \
+	-H "Content-Type: application/json" \
+	-d '{"transcript":"Check account for 9866412176"}' | jq
+```
+
+The webhook will return JSON similar to:
+
+```json
+{
+	"ok": true,
+	"reply": "Thanks. I found the account for Raghav Panthi. Would you like your balance, due date, or package details next?",
+	"language": "en",
+	"data": { "account": { /* account payload */ } }
+}
+```
+
+If you want the webhook to return only a short `reply` string for a voice engine that expects that shape, the handler already returns `reply` in the top-level JSON. Adjust payload parsing in `awaj_ai/vapi_views.py` if your Vapi configuration sends different key names.
 
 ## Quick Start
 
@@ -131,10 +160,8 @@ python manage.py runserver
 ```
 
 Open the app in your browser:
+
 - Home: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-- Call page: [http://127.0.0.1:8000/call/](http://127.0.0.1:8000/call/)
-- Dashboard: [http://127.0.0.1:8000/dashboard/](http://127.0.0.1:8000/dashboard/)
-- Code map: [http://127.0.0.1:8000/code-map](http://127.0.0.1:8000/code-map)
 
 ## Example Data Flow
 
@@ -156,21 +183,9 @@ The system prompt in `prompts/awajai_system_prompt.md` defines:
 - bilingual English/Nepali response behavior
 - memory and conversational continuity
 
-## Code Map
-
-The `/code-map` page provides a visual explanation of:
-
-- system architecture
-- module structure
-- backend service flow
-- voice tool integration flow
-
-A downloadable SVG architecture diagram is also included at `static/docs/code-map.svg`.
-
 ## Tools and Platforms Used
 
 - Django
-- SQLite
 - Vapi-ready voice assistant flow
 - Django templates
 - JSON-based backend tool endpoints
@@ -183,16 +198,6 @@ A downloadable SVG architecture diagram is also included at `static/docs/code-ma
 - making the project understandable to non-technical reviewers
 - designing a visual code map for system explanation
 - handling Vapi webhook timing while keeping assistant response latency low
-
-## Demo Video
-
-A 3-5 minute demo video should be recorded separately for submission. It should show:
-
-- the home page
-- the call page
-- the dashboard
-- the code map page
-- one sample API/tool flow
 
 ## Running Tests
 
@@ -207,28 +212,9 @@ python manage.py test
 - Use the existing project structure to add features: `accounts`, `support`, `faq`, `core`.
 - Please open issues or PRs with clear reproduction steps and the target branch `main`.
 
-## GitHub And Vercel Deploy
-
-1. Make sure the repo is clean locally and the virtual environment plus SQLite file are ignored.
-2. Commit the code changes and push to GitHub.
-3. Import the GitHub repo into Vercel.
-4. Vercel will use `api/index.py` and `vercel.json` to serve the Django app.
-5. Set secrets such as `SECRET_KEY` and any Vapi keys in the Vercel project settings.
-
-If you want the deployed site to use different hostnames, set `ALLOWED_HOSTS` in Vercel to include them.
-
 ## License
 
 This repository does not include an explicit license file. If you plan to publish or share this project, add a `LICENSE` file (for example MIT or Apache-2.0) to clarify reuse terms.
-
-## Submission Checklist
-
-- GitHub repository: this project workspace
-- README with setup instructions: included
-- Short explanation of how the assistant works: included above
-- Tools/platforms used: included above
-- Challenges faced during development: included above
-- Demo video (3-5 minutes): still needed as a separate recording
 
 ## Notes
 

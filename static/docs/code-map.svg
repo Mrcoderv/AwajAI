@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-label="AwajAI architecture diagram">
-  <!-- Updated: 2026-05-30 by GPT-5 mini (extracted chat flow consolidation) -->
+  <!-- Updated: 2026-05-31 — regenerated to match repo structure -->
   <defs>
     <style>
       .bg { fill: #f8f5ef; }
@@ -17,42 +18,50 @@
   <rect class="bg" x="0" y="0" width="1400" height="820"/>
   <text class="title" x="60" y="70">AwajAI Code Map</text>
 
+  <!-- Left: User / Client -->
   <rect class="panel" x="60" y="120" width="220" height="100"/>
-  <text class="label" x="85" y="165">User</text>
-  <text class="text" x="85" y="192">Voice input</text>
+  <text class="label" x="85" y="160">User / Client</text>
+  <text class="text" x="85" y="188">Browser (chat) • Voice (Vapi)</text>
 
-  <rect class="panel" x="330" y="120" width="260" height="100"/>
-  <text class="label" x="355" y="165">Vapi Assistant</text>
-  <text class="text" x="355" y="192">Intent + tool routing</text>
+  <!-- Vapi Assistant -->
+  <rect class="panel" x="320" y="120" width="260" height="100"/>
+  <text class="label" x="345" y="160">Vapi Assistant</text>
+  <text class="text" x="345" y="188">Webhook: /api/vapi-webhook</text>
 
-  <rect class="panel" x="650" y="120" width="300" height="100"/>
-  <text class="label" x="675" y="165">Django API Layer</text>
-  <text class="text" x="675" y="192">JSON endpoints</text>
+  <!-- Django API Layer -->
+  <rect class="panel" x="620" y="120" width="320" height="100"/>
+  <text class="label" x="645" y="160">Django API Layer</text>
+  <text class="text" x="645" y="188">/api/chat • /api/check_account • /api/faq • /api/package</text>
 
-  <rect class="panel" x="1010" y="120" width="330" height="100"/>
-  <text class="label" x="1035" y="165">Apps</text>
-  <text class="text" x="1035" y="192">accounts • support • faq • core</text>
+  <!-- Engine &amp; routing -->
+  <rect class="panel" x="980" y="120" width="360" height="100"/>
+  <text class="label" x="1005" y="160">Engine / Router</text>
+  <text class="text" x="1005" y="188">`awaj_ai.engine.process_message` → tool dispatch</text>
 
-  <line class="arrow" x1="280" y1="170" x2="330" y2="170"/>
-  <line class="arrow" x1="590" y1="170" x2="650" y2="170"/>
-  <line class="arrow" x1="950" y1="170" x2="1010" y2="170"/>
+  <line class="arrow" x1="280" y1="170" x2="320" y2="170"/>
+  <line class="arrow" x1="580" y1="170" x2="620" y2="170"/>
+  <line class="arrow" x1="940" y1="170" x2="980" y2="170"/>
 
-  <rect class="panel" x="520" y="320" width="360" height="100"/>
-  <text class="label" x="545" y="365">SQLite Database</text>
-  <text class="text" x="545" y="392">Customer, package, and FAQ records</text>
+  <!-- Data / Demo JSON store -->
+  <rect class="panel" x="520" y="320" width="360" height="110"/>
+  <text class="label" x="545" y="360">Data Store</text>
+  <text class="text" x="545" y="388">`data/customers.json`, `data/faqs.json`, `data/packages.json`</text>
 
   <line class="arrow" x1="1175" y1="220" x2="700" y2="320"/>
 
+  <!-- Backend apps overview -->
   <rect class="panel" x="60" y="500" width="580" height="190"/>
-  <text class="label" x="85" y="545">Backend Structure</text>
-  <text class="text" x="85" y="580">accounts → customer data</text>
-  <text class="text" x="85" y="612">support → conversation handling</text>
-  <text class="text" x="85" y="644">faq → knowledge base</text>
-  <text class="text" x="85" y="676">core → shared utilities and views</text>
+  <text class="label" x="85" y="540">Backend Apps</text>
+  <text class="text" x="85" y="570">`accounts` → demo customer services (`accounts/services.py`)</text>
+  <text class="text" x="85" y="598">`faq` → FAQ KB &amp; search (`core/services.py` / `faq/services.py`)</text>
+  <text class="text" x="85" y="626">`support` → ticketing &amp; troubleshooting</text>
+  <text class="text" x="85" y="654">`core` → shared utilities, views, templates</text>
 
+  <!-- Tool integration flow -->
   <rect class="panel" x="720" y="500" width="620" height="190"/>
-  <text class="label" x="745" y="545">Tool Integration Flow</text>
-  <text class="text" x="745" y="580">User voice input → Vapi assistant → Django API call</text>
-  <text class="text" x="745" y="612">Response returned to AI → spoken back to user</text>
-  <text class="text" x="745" y="644">Short JSON responses power voice-first support</text>
+  <text class="label" x="745" y="540">Tool Integration Flow</text>
+  <text class="text" x="745" y="570">User voice input → Vapi webhook → Django `/api/*`</text>
+  <text class="text" x="745" y="596">Engine (`awaj_ai.engine`) dispatches to app services</text>
+  <text class="text" x="745" y="622">Responses: JSON payloads → Vapi or browser UI</text>
+  <text class="text" x="745" y="648">Demo data served from `data/*.json` (not production APIs)</text>
 </svg>
