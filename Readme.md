@@ -20,36 +20,6 @@ AwajAI can:
 - HTML/CSS for the UI
 - Vapi-ready voice assistant flow
 - JSON APIs for tool integration
-
-## Project Structure
-
-- `accounts` - customer data and account lookup logic
-- `support` - conversation flow support and assistant-facing behavior
-- `faq` - FAQ knowledge-base models and search logic
-- `core` - shared utilities, frontend pages, and architecture views
-
-
-## How It Works
-
-Voice flow:
-
-`User Voice Input -> Vapi Assistant -> Django API -> Database {json template}-> Response -> Spoken Reply`
-
-Tool flow:
-
-`User Voice Input -> Vapi Assistant -> Django API Tool Call -> JSON Response -> Spoken Back to User`
-
-
-## Sample Mock Accounts
-
-These test accounts are seeded in `data/customers.json` so evaluators can try the app immediately.
-
-| Phone Number   | Name            | Status   |
-| -------------- | --------------- | -------- |
-| `9866412176` | Raghav Panthi   | active   |
-| `9857654321` | Sadhana Neupane | active   |
-| `9801112233` | Ramesh Thapa    | inactive |
-
 ## Quick Start
 
 1. Create and activate a Python virtual environment:
@@ -81,6 +51,36 @@ python manage.py runserver
 Open the app in your browser:
 
 - Home: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+## Project Structure
+
+- `accounts` - customer data and account lookup logic
+- `support` - conversation flow support and assistant-facing behavior
+- `faq` - FAQ knowledge-base models and search logic
+- `core` - shared utilities, frontend pages, and architecture views
+
+
+## How It Works
+
+Voice flow:
+
+`User Voice Input -> Vapi Assistant -> Django API -> Database {json template}-> Response -> Spoken Reply`
+
+Tool flow:
+
+`User Voice Input -> Vapi Assistant -> Django API Tool Call -> JSON Response -> Spoken Back to User`
+
+
+## Sample Mock Accounts
+
+These test accounts are seeded in `data/customers.json` so evaluators can try the app immediately.
+
+| Phone Number   | Name            | Status   |
+| -------------- | --------------- | -------- |
+| `9866412176` | Raghav Panthi   | active   |
+| `9857654321` | Sadhana Neupane | active   |
+| `9801112233` | Ramesh Thapa    | inactive |
+
+
 
 ## Example Data Flow
 
