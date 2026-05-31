@@ -113,11 +113,7 @@ The system prompt in `prompts/awajai_system_prompt.md` defines:
 
 - keeping responses short while still being useful for voice support
 - separating API logic into services for cleaner architecture
-- supporting bilingual English/Nepali behavior naturally
-- making the project understandable to non-technical reviewers
-- designing a visual code map for system explanation
-- handling Vapi webhook timing while keeping assistant response latency low
-
+- supporting bilingual English/Nepali behavior naturally 
 ## Running Tests
 
 Run the Django test suite:
@@ -126,14 +122,6 @@ Run the Django test suite:
 python manage.py test
 ```
 
-## Contributing
-
-- Use the existing project structure to add features: `accounts`, `support`, `faq`, `core`.
-- Please open issues or PRs with clear reproduction steps and the target branch `main`.
-
-## License
-
-This repository does not include an explicit license file. If you plan to publish or share this project, add a `LICENSE` file (for example MIT or Apache-2.0) to clarify reuse terms.
 
 ## Notes
 
